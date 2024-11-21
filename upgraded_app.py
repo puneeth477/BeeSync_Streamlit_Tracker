@@ -12,7 +12,7 @@ def load_data_from_local(file_path):
     return data
 
 # Local Excel file path
-FILE_PATH = "/home/bhlp0125/CSM-Streamlit/BeeSync _ Streamlit_Tracker.xlsx"
+FILE_PATH = "BeeSync _ Streamlit_Tracker.xlsx"
 
 # Inject custom CSS for styling
 st.markdown(
