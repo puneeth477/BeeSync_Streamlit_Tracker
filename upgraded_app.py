@@ -20,7 +20,7 @@ st.markdown(
             font-family: 'Sans-serif';
         }
         .stButton button {
-            background-color: #33b073;
+            background-color: #5da7d9; /* Medium-light blue */
             color: white;
             border-radius: 8px;
             padding: 8px 16px;
@@ -30,7 +30,7 @@ st.markdown(
             color: #004d99;
         }
         .title-box {
-            background-color: #33b073;
+            background-color: #5da7d9; /* Medium-light blue */
             color: white;
             font-size: 36px;
             font-weight: bold;
@@ -46,7 +46,7 @@ st.markdown(
             margin: 20px 0;
         }
         table th {
-            background-color: #33b073;
+            background-color: #5da7d9; /* Medium-light blue */
             color: white;
             padding: 12px;
             text-align: left;
