@@ -16,12 +16,23 @@ st.markdown(
     """
     <style>
         body {
-            background: linear-gradient(135deg, #86c7f3, #33b073);
-            color: white;
+            background: linear-gradient(135deg, #e6f7ff, #b3e6ff);
             font-family: 'Sans-serif';
         }
-        .css-1h6j0fc {
-            color: black !important;
+        .stButton button {
+            background-color: #33b073;
+            color: white;
+            border-radius: 8px;
+            padding: 8px 16px;
+            border: none;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #004d99;
+        }
+        .icon {
+            font-size: 50px;
+            margin: 10px;
+            color: #33b073;
         }
     </style>
     """,
@@ -53,14 +64,29 @@ st.write(account_data)
 st.subheader("Feedback Score Trend")
 if "Meeting Date" in account_data.columns and "Feedback Score (1-10)" in account_data.columns:
     account_data["Meeting Date"] = pd.to_datetime(account_data["Meeting Date"])
+    # Format Meeting Date to display Month-Year
+    account_data["Meeting Month-Year"] = account_data["Meeting Date"].dt.strftime("%b-%Y")
     score_chart = px.line(
         account_data,
-        x="Meeting Date",
+        x="Meeting Month-Year",
         y="Feedback Score (1-10)",
         title="Feedback Score Over Time",
         markers=True,
     )
+    score_chart.update_layout(xaxis_title="Month-Year", yaxis_title="Feedback Score")
     st.plotly_chart(score_chart)
+
+# Add Fun Icons
+st.markdown(
+    """
+    <div style="text-align: center;">
+        <span class="icon">🐝</span>
+        <span class="icon">📊</span>
+        <span class="icon">✅</span>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Add a Refresh Button
 if st.button("Refresh Data"):
