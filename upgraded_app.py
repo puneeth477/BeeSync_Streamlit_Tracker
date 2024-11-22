@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Set up styling
+# Styling for background, table, and buttons
 st.markdown(
     """
     <style>
@@ -29,28 +29,23 @@ st.markdown(
         h1, h2, h3, h4, h5, h6 {
             color: #004d99;
         }
-        .styled-table {
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin: 25px 0;
-            font-size: 16px;
-            text-align: left;
-            background-color: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
         }
-        .styled-table th {
-            background-color: #004d99;
+        table th {
+            background-color: #33b073;
             color: white;
+            padding: 12px;
             text-align: left;
-            padding: 12px 15px;
         }
-        .styled-table td {
-            padding: 12px 15px;
+        table td {
+            padding: 12px;
             border-bottom: 1px solid #ddd;
+            text-align: left;
         }
-        .styled-table tr:hover {
+        table tr:hover {
             background-color: #f1f1f1;
         }
     </style>
@@ -77,52 +72,27 @@ account_data = df[df["Account Name"] == selected_account]
 
 # Format dates to exclude time
 if "Meeting Date" in account_data.columns:
-    account_data["Meeting Date"] = pd.to_datetime(account_data["Meeting Date"]).dt.date
+    account_data["Meeting Date"] = pd.to_datetime(account_data["Meeting Date"], errors="coerce").dt.date
 
 if "Follow-Up Date" in account_data.columns:
-    account_data["Follow-Up Date"] = pd.to_datetime(account_data["Follow-Up Date"]).dt.date
+    account_data["Follow-Up Date"] = pd.to_datetime(account_data["Follow-Up Date"], errors="coerce").dt.date
 
 st.title(f"Account Details for {selected_account}")
 
-# Render account data as a styled table
+# Display the table
 st.markdown("<h3 style='color: #004d99;'>Meeting Details</h3>", unsafe_allow_html=True)
 if not account_data.empty:
-    table_html = """
-    <table class="styled-table">
-        <thead>
-            <tr>
-                <th>Meeting Date</th>
-                <th>Status</th>
-                <th>Feedback Score</th>
-                <th>Follow-Up Date</th>
-                <th>Next Meeting Planned</th>
-                <th>Escalations</th>
-                <th>CSM Owner</th>
-            </tr>
-        </thead>
-        <tbody>
-    """
-    for _, row in account_data.iterrows():
-        table_html += f"""
-        <tr>
-            <td>{row['Meeting Date']}</td>
-            <td>{row['Meeting Status']}</td>
-            <td>{row['Feedback Score (1-10)']}</td>
-            <td>{row['Follow-Up Date']}</td>
-            <td>{row['Next Meeting Planned (Yes/No)']}</td>
-            <td>{row['Escalations (Yes/No)']}</td>
-            <td>{row['CSM Owner']}</td>
-        </tr>
-        """
-    table_html += "</tbody></table>"
-    st.markdown(table_html, unsafe_allow_html=True)
+    st.markdown(
+        account_data.to_html(index=False, escape=False, justify="left"),
+        unsafe_allow_html=True,
+    )
 else:
     st.write("No data available for this account.")
 
 # Add a Plotly Chart
 st.subheader("Feedback Score Trend")
 if "Meeting Date" in account_data.columns and "Feedback Score (1-10)" in account_data.columns:
-    account_data["Meeting Month-Year"] = account_data["Meeting Date"].dt.strftime("%b-%Y")
+    account_data["Meeting Month-Year"] = pd.to_datetime(account_data["Meeting Date"], errors="coerce").dt.strftime("%b-%Y")
     score_chart = px.line(
         account_data,
         x="Meeting Month-Year",
