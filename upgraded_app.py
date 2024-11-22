@@ -1,112 +1,67 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
+from pathlib import Path
 
-# Set page configuration - must be the first Streamlit command
-st.set_page_config(page_title="CSM Tracker Dashboard", layout="wide")
+# Set page configuration
+st.set_page_config(
+    page_title="BeeSync Streamlit Tracker",
+    page_icon="🐝",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
-# Load data from a local file
-@st.cache
-def load_data_from_local(file_path):
-    data = pd.read_excel(file_path)
-    data.columns = data.columns.str.strip()  # Clean column names
-    return data
-
-# Local Excel file path
-FILE_PATH = "BeeSync _ Streamlit_Tracker.xlsx"
-
-# Inject custom CSS for styling
+# Set up styling
 st.markdown(
     """
     <style>
-    /* Set background colors */
-    .stApp {
-        background: linear-gradient(135deg, #eafcff, #e8f6f3);
-    }
-
-    /* Title styling */
-    h1 {
-        font-size: 2.5rem;
-        text-align: center;
-        color: #0a74da;
-        margin-bottom: 20px;
-    }
-
-    /* Sidebar styling */
-    section[data-testid="stSidebar"] {
-        background-color: #0a74da;
-        color: white;
-    }
-
-    section[data-testid="stSidebar"] h3 {
-        font-size: 1.2rem;
-        color: white;
-    }
-
-    /* Metric styling */
-    .stMetric {
-        background: #eafcff;
-        border: 2px solid #00b38f;
-        border-radius: 10px;
-        padding: 5px;
-        color: #0a74da;
-    }
+        body {
+            background: linear-gradient(135deg, #86c7f3, #33b073);
+            color: white;
+            font-family: 'Sans-serif';
+        }
+        .css-1h6j0fc {
+            color: black !important;
+        }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# Title
-st.title("BeeHyv CSM Tracker Dashboard")
+# Load the Excel file
+file_path = Path("BeeSync _ Streamlit_Tracker.xlsx")
 
 try:
-    # Load the data
-    data = load_data_from_local(FILE_PATH)
-
-    # Sidebar: Select Account
-    st.sidebar.header("Select an Account")
-    account_names = data["Account Name"].unique()
-    selected_account = st.sidebar.selectbox("Accounts", account_names)
-
-    # Filter data for the selected account
-    account_data = data[data["Account Name"] == selected_account]
-
-    # Display account details
-    st.subheader(f"Details for Account: {selected_account}")
-    st.dataframe(account_data[[
-        "Quarter", "Meeting Date", "Meeting Status", "Meeting Cadence",
-        "Follow-Up Date", "Feedback Score (1-10)", "MoM Notes",
-        "Next Meeting Planned (Yes/No)", "Date of Next Meeting", 
-        "Escalations (Yes/No)", "CSM Owner"
-    ]])
-
-    # Display metrics for the selected account
-    st.subheader("Account Metrics")
-    total_meetings = len(account_data)
-    completed_meetings = len(account_data[account_data["Meeting Status"] == "Completed"])
-    average_feedback = account_data["Feedback Score (1-10)"].mean()
-    next_meeting_count = len(account_data[account_data["Next Meeting Planned (Yes/No)"] == "Yes"])
-    escalations_count = len(account_data[account_data["Escalations (Yes/No)"] == "Yes"])
-
-    # Show metrics
-    col1, col2, col3, col4, col5 = st.columns(5)
-    col1.metric("Total Meetings", total_meetings)
-    col2.metric("Completed Meetings", completed_meetings)
-    col3.metric("Avg. Feedback Score", f"{average_feedback:.1f}" if pd.notna(average_feedback) else "N/A")
-    col4.metric("Next Meetings", next_meeting_count)
-    col5.metric("Escalations", escalations_count)
-
-    # Add notes
-    st.subheader("Account Notes")
-    for index, row in account_data.iterrows():
-        st.markdown(f"**MoM Notes for {row['Meeting Date']}**: {row['MoM Notes']}")
-
-    # Add refresh button
-    if st.button("Refresh Data"):
-        st.experimental_rerun()
-
+    df = pd.read_excel(file_path)
 except FileNotFoundError:
-    st.error(f"The file at {FILE_PATH} was not found. Please ensure the path is correct.")
-except KeyError as e:
-    st.error(f"A required column is missing: {e}")
-except Exception as e:
-    st.error(f"An error occurred: {e}")
+    st.error(f"File not found: {file_path}. Please ensure it is in the correct location.")
+    st.stop()
+
+# Sidebar
+st.sidebar.header("BeeSync Tracker")
+account_list = df["Account Name"].unique().tolist()
+selected_account = st.sidebar.selectbox("Select an Account", account_list)
+
+# Display account-specific data
+account_data = df[df["Account Name"] == selected_account]
+
+# Display Account Info
+st.title(f"Account Details for {selected_account}")
+st.write(account_data)
+
+# Add a Plotly Chart
+st.subheader("Feedback Score Trend")
+if "Meeting Date" in account_data.columns and "Feedback Score (1-10)" in account_data.columns:
+    account_data["Meeting Date"] = pd.to_datetime(account_data["Meeting Date"])
+    score_chart = px.line(
+        account_data,
+        x="Meeting Date",
+        y="Feedback Score (1-10)",
+        title="Feedback Score Over Time",
+        markers=True,
+    )
+    st.plotly_chart(score_chart)
+
+# Add a Refresh Button
+if st.button("Refresh Data"):
+    st.experimental_rerun()
