@@ -91,6 +91,12 @@ if "Meeting Date" in account_data.columns:
 if "Follow-Up Date" in account_data.columns:
     account_data["Follow-Up Date"] = pd.to_datetime(account_data["Follow-Up Date"], errors="coerce").dt.date
 
+# Render hyperlinks in "Meeting Notes"
+if "Meeting Notes" in account_data.columns:
+    def make_clickable(link):
+        return f'<a href="{link}" target="_blank">{link}</a>' if pd.notnull(link) else ""
+    account_data["Meeting Notes"] = account_data["Meeting Notes"].apply(make_clickable)
+
 # Display account details title
 st.markdown(
     f"<h3 style='color: #004d99;'>BeeSync Details for Account: {selected_account}</h3>",
