@@ -137,4 +137,14 @@ if "Meeting Date" in account_data.columns and "Feedback Score (1-10)" in account
 st.markdown(
     """
     <div style="text-align: center;">
-        <span class="
+        <span class="icon">🐝</span>
+        <span class="icon">📊</span>
+        <span class="icon">✅</span>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Add a Refresh Button
+if st.button("Refresh Data"):
+    st.experimental_rerun()
