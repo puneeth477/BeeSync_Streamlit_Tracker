@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Styling for background, table, and buttons
+# Styling for background, table, title box, and buttons
 st.markdown(
     """
     <style>
@@ -29,11 +29,15 @@ st.markdown(
         h1, h2, h3, h4, h5, h6 {
             color: #004d99;
         }
-        .main-title {
-            font-size: 40px;
+        .title-box {
+            background-color: #33b073;
+            color: white;
+            font-size: 36px;
             font-weight: bold;
-            color: #004d99;
+            padding: 20px;
             text-align: center;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
         table {
@@ -74,8 +78,8 @@ st.sidebar.header("BeeSync Tracker")
 account_list = df["Account Name"].unique().tolist()
 selected_account = st.sidebar.selectbox("Select an Account", account_list)
 
-# Display page title
-st.markdown("<div class='main-title'>BeeSync Tracker</div>", unsafe_allow_html=True)
+# Display page title in a styled box
+st.markdown("<div class='title-box'>BeeSync Tracker</div>", unsafe_allow_html=True)
 
 # Display account-specific data
 account_data = df[df["Account Name"] == selected_account]
