@@ -29,22 +29,29 @@ st.markdown(
         h1, h2, h3, h4, h5, h6 {
             color: #004d99;
         }
-        .card {
-            background: #ffffff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 15px;
+        .styled-table {
             width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 16px;
+            text-align: left;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .card-header {
-            font-size: 18px;
-            font-weight: bold;
-            color: #004d99;
+        .styled-table th {
+            background-color: #004d99;
+            color: white;
+            text-align: left;
+            padding: 12px 15px;
         }
-        .card-content {
-            font-size: 14px;
-            color: #333333;
+        .styled-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .styled-table tr:hover {
+            background-color: #f1f1f1;
         }
     </style>
     """,
@@ -68,26 +75,50 @@ selected_account = st.sidebar.selectbox("Select an Account", account_list)
 # Display account-specific data
 account_data = df[df["Account Name"] == selected_account]
 
-# Display Account Info in Card Style Layout
+# Format the "Meeting Date" column to exclude the time
+if "Meeting Date" in account_data.columns:
+    account_data["Meeting Date"] = pd.to_datetime(account_data["Meeting Date"]).dt.date
+
 st.title(f"Account Details for {selected_account}")
 
-for index, row in account_data.iterrows():
+# Render account data as a styled table
+st.markdown("<h3 style='color: #004d99;'>Meeting Details</h3>", unsafe_allow_html=True)
+st.markdown(
+    f"""
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Meeting Date</th>
+                <th>Status</th>
+                <th>Feedback Score</th>
+                <th>Follow-Up Date</th>
+                <th>Next Meeting Planned</th>
+                <th>Escalations</th>
+                <th>CSM Owner</th>
+            </tr>
+        </thead>
+        <tbody>
+    """,
+    unsafe_allow_html=True,
+)
+
+for _, row in account_data.iterrows():
     st.markdown(
         f"""
-        <div class="card">
-            <div class="card-header">Meeting on: {row['Meeting Date']}</div>
-            <div class="card-content">
-                <p><strong>Status:</strong> {row['Meeting Status']}</p>
-                <p><strong>Feedback Score:</strong> {row['Feedback Score (1-10)']}</p>
-                <p><strong>Follow-Up Date:</strong> {row['Follow-Up Date']}</p>
-                <p><strong>Next Meeting Planned:</strong> {row['Next Meeting Planned (Yes/No)']}</p>
-                <p><strong>Escalations:</strong> {row['Escalations (Yes/No)']}</p>
-                <p><strong>CSM Owner:</strong> {row['CSM Owner']}</p>
-            </div>
-        </div>
+        <tr>
+            <td>{row['Meeting Date']}</td>
+            <td>{row['Meeting Status']}</td>
+            <td>{row['Feedback Score (1-10)']}</td>
+            <td>{row['Follow-Up Date']}</td>
+            <td>{row['Next Meeting Planned (Yes/No)']}</td>
+            <td>{row['Escalations (Yes/No)']}</td>
+            <td>{row['CSM Owner']}</td>
+        </tr>
         """,
         unsafe_allow_html=True,
     )
+
+st.markdown("</tbody></table>", unsafe_allow_html=True)
 
 # Add a Plotly Chart
 st.subheader("Feedback Score Trend")
