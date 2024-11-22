@@ -75,16 +75,19 @@ selected_account = st.sidebar.selectbox("Select an Account", account_list)
 # Display account-specific data
 account_data = df[df["Account Name"] == selected_account]
 
-# Format the "Meeting Date" column to exclude the time
+# Format dates to exclude time
 if "Meeting Date" in account_data.columns:
     account_data["Meeting Date"] = pd.to_datetime(account_data["Meeting Date"]).dt.date
+
+if "Follow-Up Date" in account_data.columns:
+    account_data["Follow-Up Date"] = pd.to_datetime(account_data["Follow-Up Date"]).dt.date
 
 st.title(f"Account Details for {selected_account}")
 
 # Render account data as a styled table
 st.markdown("<h3 style='color: #004d99;'>Meeting Details</h3>", unsafe_allow_html=True)
-st.markdown(
-    f"""
+if not account_data.empty:
+    table_html = """
     <table class="styled-table">
         <thead>
             <tr>
@@ -98,13 +101,9 @@ st.markdown(
             </tr>
         </thead>
         <tbody>
-    """,
-    unsafe_allow_html=True,
-)
-
-for _, row in account_data.iterrows():
-    st.markdown(
-        f"""
+    """
+    for _, row in account_data.iterrows():
+        table_html += f"""
         <tr>
             <td>{row['Meeting Date']}</td>
             <td>{row['Meeting Status']}</td>
@@ -114,17 +113,15 @@ for _, row in account_data.iterrows():
             <td>{row['Escalations (Yes/No)']}</td>
             <td>{row['CSM Owner']}</td>
         </tr>
-        """,
-        unsafe_allow_html=True,
-    )
-
-st.markdown("</tbody></table>", unsafe_allow_html=True)
+        """
+    table_html += "</tbody></table>"
+    st.markdown(table_html, unsafe_allow_html=True)
+else:
+    st.write("No data available for this account.")
 
 # Add a Plotly Chart
 st.subheader("Feedback Score Trend")
 if "Meeting Date" in account_data.columns and "Feedback Score (1-10)" in account_data.columns:
-    account_data["Meeting Date"] = pd.to_datetime(account_data["Meeting Date"])
-    # Format Meeting Date to display Month-Year
     account_data["Meeting Month-Year"] = account_data["Meeting Date"].dt.strftime("%b-%Y")
     score_chart = px.line(
         account_data,
@@ -140,14 +137,4 @@ if "Meeting Date" in account_data.columns and "Feedback Score (1-10)" in account
 st.markdown(
     """
     <div style="text-align: center;">
-        <span class="icon">🐝</span>
-        <span class="icon">📊</span>
-        <span class="icon">✅</span>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Add a Refresh Button
-if st.button("Refresh Data"):
-    st.experimental_rerun()
+        <span class="
