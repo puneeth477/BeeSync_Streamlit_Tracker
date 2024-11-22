@@ -29,10 +29,22 @@ st.markdown(
         h1, h2, h3, h4, h5, h6 {
             color: #004d99;
         }
-        .icon {
-            font-size: 50px;
-            margin: 10px;
-            color: #33b073;
+        .card {
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        .card-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #004d99;
+        }
+        .card-content {
+            font-size: 14px;
+            color: #333333;
         }
     </style>
     """,
@@ -56,9 +68,26 @@ selected_account = st.sidebar.selectbox("Select an Account", account_list)
 # Display account-specific data
 account_data = df[df["Account Name"] == selected_account]
 
-# Display Account Info
+# Display Account Info in Card Style Layout
 st.title(f"Account Details for {selected_account}")
-st.write(account_data)
+
+for index, row in account_data.iterrows():
+    st.markdown(
+        f"""
+        <div class="card">
+            <div class="card-header">Meeting on: {row['Meeting Date']}</div>
+            <div class="card-content">
+                <p><strong>Status:</strong> {row['Meeting Status']}</p>
+                <p><strong>Feedback Score:</strong> {row['Feedback Score (1-10)']}</p>
+                <p><strong>Follow-Up Date:</strong> {row['Follow-Up Date']}</p>
+                <p><strong>Next Meeting Planned:</strong> {row['Next Meeting Planned (Yes/No)']}</p>
+                <p><strong>Escalations:</strong> {row['Escalations (Yes/No)']}</p>
+                <p><strong>CSM Owner:</strong> {row['CSM Owner']}</p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 # Add a Plotly Chart
 st.subheader("Feedback Score Trend")
