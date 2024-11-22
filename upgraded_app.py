@@ -29,6 +29,13 @@ st.markdown(
         h1, h2, h3, h4, h5, h6 {
             color: #004d99;
         }
+        .main-title {
+            font-size: 40px;
+            font-weight: bold;
+            color: #004d99;
+            text-align: center;
+            margin-bottom: 20px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -67,6 +74,9 @@ st.sidebar.header("BeeSync Tracker")
 account_list = df["Account Name"].unique().tolist()
 selected_account = st.sidebar.selectbox("Select an Account", account_list)
 
+# Display page title
+st.markdown("<div class='main-title'>BeeSync Tracker</div>", unsafe_allow_html=True)
+
 # Display account-specific data
 account_data = df[df["Account Name"] == selected_account]
 
@@ -77,10 +87,13 @@ if "Meeting Date" in account_data.columns:
 if "Follow-Up Date" in account_data.columns:
     account_data["Follow-Up Date"] = pd.to_datetime(account_data["Follow-Up Date"], errors="coerce").dt.date
 
-st.title(f"Account Details for {selected_account}")
+# Display account details title
+st.markdown(
+    f"<h3 style='color: #004d99;'>BeeSync Details for Account: {selected_account}</h3>",
+    unsafe_allow_html=True,
+)
 
 # Display the table
-st.markdown("<h3 style='color: #004d99;'>Meeting Details</h3>", unsafe_allow_html=True)
 if not account_data.empty:
     st.markdown(
         account_data.to_html(index=False, escape=False, justify="left"),
