@@ -16,7 +16,7 @@ st.markdown(
     """
     <style>
         body {
-            background: linear-gradient(135deg, #e6f7ff, #b3e6ff);
+            background: linear-gradient(135deg, #e6f7ff, #b3e6ff); /* Light blue gradient background */
             font-family: 'Sans-serif';
         }
         .stButton button {
